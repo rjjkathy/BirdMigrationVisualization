@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<script src="http://d3js.org/topojson.v1.min.js"></script>
+	<style type="text/css">
+		svg {
+			/*background: linear-gradient(#151B54,  #5CB3FF); /* Standard syntax */
+
+			background: #3BB9FF			
+		}
+
+		path {
+			fill: black;
+			stroke: gray;
+		}
+
+		.subunit.USA { fill: red; }
+
+		.places-label{
+
+			fill: black;
+			fill-opacity: .9;
+			font-size: 1px;
+			font-weight: 1;
+			text-anchor: left;
+		}
+
+	</style>
+</head>
+
+<body>    
+
+	<script>
+
+		var width = 760,
+		height = 800;
+
+		var svg = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height",height);
+
+		d3.json("basemap.topojson", function(error, basemap) {
+			if (error) return console.error(error);
+
+			var country = topojson.feature(basemap, basemap.objects.countryUS);
+			var city = topojson.feature(basemap, basemap.objects.placesUS);
+
+			var projection = d3.geo.mercator()
+			.scale(300)
+			.translate([width*1.3, height*0.7]);
+
+    	// var projection = d3.geo.albers()
+    	// .center([150, 0])
+    	// .parallels([50, 60])
+    	// .scale(500)
+    	// .translate([width*1.4, -300]);
+
+    	var path = d3.geo.path()
+    	.projection(projection);
+
+
+    	svg.append("path")
+    	.datum(country)
+    	.attr("d", path);
+
+    	// svg.append("path")
+    	// .datum(city)
+    	// .attr("d", path)
+    	// .attr("class", "place");
+
+    	svg.selectAll(".subunit")
+    	.data(country.features)
+    	.enter().append("path")
+    	.attr("class", function(d) { return "subunit " + d.id; })
+    	.attr("d", path);
+
+    	// svg.selectAll(".place-label")
+    	// .data(city.features)
+    	// .enter().append("text")
+    	// .attr("class", "place-label")
+    	// .attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; })
+    	// .attr("dy", ".35em")
+    	// .text(function(d) { return d.properties.name; });
+
+    	// svg.selectAll(".place-label")
+    	// .attr("x", function(d) { return d.geometry.coordinates[0] > -1 ? 6 : -6; })
+    	// .style("text-anchor", function(d) { return d.geometry.coordinates[0] > -1 ? "start" : "end"; });
+
+
+    });
+
+</script>
+
+
+</body>
+
+</html>
