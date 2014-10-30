@@ -10,24 +10,65 @@
 		svg {
 			/*background: linear-gradient(#151B54,  #5CB3FF); /* Standard syntax */
 
-			background: #3BB9FF			
+			/*background: linear-gradient(black,  #19283A);		*/
+
+			/*background: -webkit-gradient(radial, center center, 0, center center, 460, from(#1a82f7), to(#2F2727));*/
+			background: -webkit-gradient(radial, 50% 50%, 50, 55% 35%, 600,  from(#413EF4), to(#010408));
 		}
 
 		path {
-			fill: black;
-			stroke: gray;	
+/*			fill: black;
+			stroke: black;*/	
 		}
 
-		.subunit.USA { fill: red; }
-
-		.places-label{
-
-			fill: black;
-			fill-opacity: .9;
-			font-size: 1px;
-			font-weight: 1;
-			text-anchor: left;
+		.land {
+			/*fill: black;
+			opacity: 1;
+			*/
 		}
+
+		.border {
+			fill: none;
+			stroke: blue;
+			stroke-weight: 5000;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+
+			-webkit-box-shadow:0 0 20px blue; 
+			-moz-box-shadow: 0 0 20px blue; 
+			box-shadow:0 0 20px blue;
+			height:20px;
+			text-align:center;
+			margin:40px auto;
+			width:200px;
+
+		}
+
+		.place
+		{
+			fill: red;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+		}
+
+		.place-label
+		{
+			stroke: white;
+			font-color: white;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+		}
+
+		text {
+			color: white;
+			fill: white;
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+			pointer-events: none;
+		}
+
+		.state19 { fill: #222; }
+		.state20 { fill: #aaa; }
+
 
 	</style>
 </head>
@@ -43,55 +84,67 @@
 		.attr("width", width)
 		.attr("height",height);
 
-		d3.json("basemap.topojson", function(error, basemap) {
+		d3.json("us_states.topojson", function(error, basemap) {
 			if (error) return console.error(error);
 
 			var country = topojson.feature(basemap, basemap.objects.countryUS);
 			var city = topojson.feature(basemap, basemap.objects.placesUS);
+			var states = topojson.feature(basemap, basemap.objects.states);
 
-			var projection = d3.geo.mercator()
-			.scale(500)
-			.translate([width + 200, height*0.6]);
+				// var projection = d3.geo.mercator()
+				// .scale(500)
+				// .translate([width + 200, height*0.6]);
 
-    	// var projection = d3.geo.albers()
-    	// .center([150, 0])
-    	// .parallels([50, 60])
-    	// .scale(500)
-    	// .translate([width*1.4, -300]);
+				// var projection = d3.geo.albers()
+				// .center([150, 0])
+				// .parallels([50, 60])
+				// .scale(500)
+				// .translate([width*1.4, -300]);
 
-    	var path = d3.geo.path()
-    	.projection(projection);
+				var color = d3.scale.linear()
+				.domain([0, 52])
+				.range(["rgb(30,30,30)","rgb(0,0,0)",
+					"rgb(18,18,18)"]);
 
+				// var color = d3.scale.category20c();
 
-    	svg.append("path")
-    	.datum(country)
-    	.attr("d", path);
+				var projection= d3.geo.albersUsa() 
+				.scale(2000) 
+				.translate([width/2 - 500, height / 2 - 200]);
 
-    	// svg.append("path")
-    	// .datum(city)
-    	// .attr("d", path)
-    	// .attr("class", "place");
+				var path = d3.geo.path()
+				.projection(projection);
 
-    	svg.selectAll(".subunit")
-    	.data(country.features)
-    	.enter().append("path")
-    	.attr("class", function(d) { return "subunit " + d.id; })
-    	.attr("d", path);
+				svg.selectAll(".subunit")
+				.data(topojson.feature(basemap, basemap.objects.placesUS).features)
+				.enter().append("path")
+				.attr("class", function(d) { return "subunit " + d.id; })
+				.attr("d", path);
 
-    	// svg.selectAll(".place-label")
-    	// .data(city.features)
-    	// .enter().append("text")
-    	// .attr("class", "place-label")
-    	// .attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; })
-    	// .attr("dy", ".35em")
-    	// .text(function(d) { return d.properties.name; });
-
-    	// svg.selectAll(".place-label")
-    	// .attr("x", function(d) { return d.geometry.coordinates[0] > -1 ? 6 : -6; })
-    	// .style("text-anchor", function(d) { return d.geometry.coordinates[0] > -1 ? "start" : "end"; });
+				svg.selectAll("append")
+				.data(topojson.feature(basemap, basemap.objects.states).features)
+				.enter()
+				.append("path")
+				.attr("d", path)
+				.attr("fill", function(d, i) { return color(i); });
 
 
-    });
+				// svg.append("path")
+				// .datum(country)
+				// .attr("class", "land")
+				// .attr("d", path);
+
+				svg.append("path")
+				.datum(city)
+				.attr("d", path)
+				.attr("class", "place");
+
+				svg.append("path")
+				.datum(states)
+				.attr("d", path)
+				.attr("class", "border")
+
+			});
 
 </script>
 
