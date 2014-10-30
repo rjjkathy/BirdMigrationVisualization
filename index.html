@@ -13,7 +13,7 @@
 			/*background: linear-gradient(black,  #19283A);		*/
 
 			/*background: -webkit-gradient(radial, center center, 0, center center, 460, from(#1a82f7), to(#2F2727));*/
-			background: -webkit-gradient(radial, 50% 50%, 50, 55% 35%, 600,  from(#413EF4), to(#010408));
+			background: -webkit-gradient(radial, 50% 50%, 50, 55% 35%, 700,  from(#413EF4), to(#010408));
 		}
 
 		path {
@@ -66,6 +66,14 @@
 			pointer-events: none;
 		}
 
+		.dataTest
+		{
+			fill: white;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+
+		}
+
 		.state19 { fill: #222; }
 		.state20 { fill: #aaa; }
 
@@ -84,12 +92,13 @@
 		.attr("width", width)
 		.attr("height",height);
 
-		d3.json("us_states.topojson", function(error, basemap) {
+		d3.json("us_states_withDataTest.topojson", function(error, basemap) {
 			if (error) return console.error(error);
 
 			var country = topojson.feature(basemap, basemap.objects.countryUS);
 			var city = topojson.feature(basemap, basemap.objects.placesUS);
 			var states = topojson.feature(basemap, basemap.objects.states);
+			var dataTest = topojson.feature(basemap, basemap.objects.dataTest);
 
 				// var projection = d3.geo.mercator()
 				// .scale(500)
@@ -109,8 +118,8 @@
 				// var color = d3.scale.category20c();
 
 				var projection= d3.geo.albersUsa() 
-				.scale(2000) 
-				.translate([width/2 - 500, height / 2 - 200]);
+				.scale(2500) 
+				.translate([width/2 - 600, height / 2 - 200]);
 
 				var path = d3.geo.path()
 				.projection(projection);
@@ -129,10 +138,10 @@
 				.attr("fill", function(d, i) { return color(i); });
 
 
-				// svg.append("path")
-				// .datum(country)
-				// .attr("class", "land")
-				// .attr("d", path);
+				svg.append("path")
+				.datum(country)
+				.attr("class", "land")
+				.attr("d", path);
 
 				svg.append("path")
 				.datum(city)
@@ -142,7 +151,12 @@
 				svg.append("path")
 				.datum(states)
 				.attr("d", path)
-				.attr("class", "border")
+				.attr("class", "border");
+
+				svg.append("path")
+				.datum(dataTest)
+				.attr("d", path)
+				.attr("class", "dataTest");
 
 			});
 
