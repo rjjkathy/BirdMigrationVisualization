@@ -1,0 +1,86 @@
+/*
+	This is the CSS file for styling of the basemap used in the visualisation of bird migration flows
+	*/
+	/* Background of svg map */
+	svg {
+		/*background: linear-gradient(#151B54,  #5CB3FF); /* Standard syntax */
+
+		/*background: linear-gradient(black,  #19283A);		*/
+
+		/*background: -webkit-gradient(radial, center center, 0, center center, 460, from(#1a82f7), to(#2F2727));*/
+		background: -webkit-gradient(radial, 50% 50%, 50, 55% 35%, 700,  from(#413EF4), to(#010408));
+	}
+
+	path {
+/*			fill: black;
+stroke: black;*/	
+}
+
+.land {
+			/*fill: black;
+			opacity: 1;
+			*/
+		}
+
+		.border {
+			fill: none;
+			stroke: blue;
+			stroke-weight: 5000;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+
+			-webkit-box-shadow:0 0 20px blue; 
+			-moz-box-shadow: 0 0 20px blue; 
+			box-shadow:0 0 20px blue;
+			height:20px;
+			text-align:center;
+			margin:40px auto;
+			width:200px;
+
+		}
+
+		.place
+		{
+			fill: red;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+		}
+
+		.place-label
+		{
+			stroke: white;
+			font-color: white;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+		}
+
+		text {
+			color: white;
+			fill: white;
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+			pointer-events: none;
+		}
+
+		.dataTest
+		{
+			fill: yellow;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+
+		}
+
+		#display {
+			position: relative;
+		}
+
+		#field {
+			top: 0;
+			left: 0;
+			position: absolute;
+			color = white;
+			stroke = white;
+			fill = white;
+		}
+
+		.state19 { fill: #222; }
+		.state20 { fill: #aaa; }

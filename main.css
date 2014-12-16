@@ -1,0 +1,102 @@
+#controls {
+    background-color: black;
+    border-bottom: 1px solid #e7e7e7;
+    border-top: 1px solid #e7e7e7;
+    padding-bottom: 20px;
+    padding-top: 20px;
+}
+
+#display {
+    background: -webkit-gradient(radial, 30% 50%, 50, 55% 35%, 700,  from(#413EF4), to(#010408));    height: 600px;
+
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+#canvas {
+    background: -webkit-gradient(radial, 30% 50%, 50, 55% 35%, 700,  from(#413EF4), to(#010408));    height: 600px;
+    overflow: hidden; /* Cuts of #map-svg and #field-canvas */
+    position: relative;
+}
+
+/* Basemap */
+#map {
+}
+#map-svg {
+}
+
+/* Animation */
+#animation {
+    left: 0;
+    position: absolute;
+    top: 0;
+}
+
+.land {
+            /*fill: black;
+            opacity: 1;
+            */
+        }
+
+        .border {
+            fill: none;
+            stroke: blue;
+            stroke-weight: 5000;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+
+            -webkit-box-shadow:0 0 20px blue; 
+            -moz-box-shadow: 0 0 20px blue; 
+            box-shadow:0 0 20px blue;
+            height:20px;
+            text-align:center;
+            margin:40px auto;
+            width:200px;
+
+        }
+
+        .place
+        {
+            fill: red;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+        }
+
+        .place-label
+        {
+            stroke: white;
+            font-color: white;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+        }
+
+        text {
+            color: white;
+            fill: white;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            pointer-events: none;
+        }
+
+        .dataTest
+        {
+            fill: yellow;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+
+        }
+
+        #display {
+            position: relative;
+        }
+
+        #field {
+            top: 0;
+            left: 0;
+            position: absolute;
+            color = white;
+            stroke = white;
+            fill = white;
+        }
+
+        .state19 { fill: #222; }
+        .state20 { fill: #aaa; }
+

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<script src="http://d3js.org/topojson.v1.min.js"></script>
+	<style type="text/css">
+		svg {
+			/*background: linear-gradient(#151B54,  #5CB3FF); /* Standard syntax */
+
+			/*background: linear-gradient(black,  #19283A);		*/
+
+			/*background: -webkit-gradient(radial, center center, 0, center center, 460, from(#1a82f7), to(#2F2727));*/
+			background: -webkit-gradient(radial, 50% 50%, 50, 55% 35%, 700,  from(#413EF4), to(#010408));
+		}
+
+		path {
+/*			fill: black;
+			stroke: black;*/	
+		}
+
+		.land {
+			/*fill: black;
+			opacity: 1;
+			*/
+		}
+
+		.border {
+			fill: none;
+			stroke: blue;
+			stroke-weight: 5000;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+
+			-webkit-box-shadow:0 0 20px blue; 
+			-moz-box-shadow: 0 0 20px blue; 
+			box-shadow:0 0 20px blue;
+			height:20px;
+			text-align:center;
+			margin:40px auto;
+			width:200px;
+
+		}
+
+		.place
+		{
+			fill: red;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+		}
+
+		.place-label
+		{
+			stroke: white;
+			font-color: white;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+		}
+
+		text {
+			color: white;
+			fill: white;
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+			pointer-events: none;
+		}
+
+		.dataTest
+		{
+			fill: yellow;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+
+		}
+
+		.state19 { fill: #222; }
+		.state20 { fill: #aaa; }
+
+
+	</style>
+</head>
+
+<body>    
+
+	<script>
+
+		var width = 1460,
+		height = 1500;
+
+		var svg = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height",height);
+
+		d3.json("basemap.topojson", function(error, basemap) {
+			if (error) return console.error(error);
+
+			var country = topojson.feature(basemap, basemap.objects.countryUS);
+			var city = topojson.feature(basemap, basemap.objects.placesUS);
+			var states = topojson.feature(basemap, basemap.objects.states);
+			var dataTest = topojson.feature(basemap, basemap.objects.dataTest);
+
+				var color = d3.scale.linear()
+				.domain([0, 52])
+				.range(["rgb(30,30,30)","rgb(0,0,0)",
+					"rgb(18,18,18)"]);
+
+				var projection= d3.geo.albersUsa() 
+				.scale(3000) 
+				.translate([width/2 - 800, height / 2 - 100]);
+
+				var path = d3.geo.path()
+				.projection(projection);
+
+				svg.selectAll(".subunit")
+				.data(topojson.feature(basemap, basemap.objects.placesUS).features)
+				.enter().append("path")
+				.attr("class", function(d) { return "subunit " + d.id; })
+				.attr("d", path);
+
+				svg.selectAll("append")
+				.data(topojson.feature(basemap, basemap.objects.states).features)
+				.enter()
+				.append("path")
+				.attr("d", path)
+				.attr("fill", function(d, i) { return color(i); });
+				
+				svg.append("path")
+				.datum(city)
+				.attr("d", path)
+				.attr("class", "place");
+
+				svg.append("path")
+				.datum(states)
+				.attr("d", path)
+				.attr("class", "border");
+
+				svg.append("path")
+				.datum(dataTest)
+				.attr("d", path)
+				.attr("class", "dataTest");
+
+			});
+
+</script>
+
+
+</body>
+
+</html>

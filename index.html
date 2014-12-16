@@ -1,168 +1,68 @@
 <!DOCTYPE html>
-
 <html>
+    <head>
+        <meta charset="utf-8">
+        <title>Twisting Existing Code</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="main.css"/>
+    </head>
+    <body>
+        <div id="controls">
+            <div class="container">
+                <div class="form-inline clearfix">
+                    <div class="form-group pull-left">
+                        <label class="sr-only" for="time-int">Date/time</label>
+                        <input type="datetime" id="time-int" class="form-control" onfocus="pause()" value="April 5 2013, 00:00">
 
-<head>
-	<meta charset="utf-8">
-	<script src="http://d3js.org/d3.v3.min.js"></script>
-	<script src="http://d3js.org/topojson.v1.min.js"></script>
-	<style type="text/css">
-		svg {
-			/*background: linear-gradient(#151B54,  #5CB3FF); /* Standard syntax */
+                        <button type="button" id="play-pause" class="btn btn-default" onclick="playPause()"><span class="glyphicon glyphicon-pause"></button>
 
-			/*background: linear-gradient(black,  #19283A);		*/
+                        <button type="button" id="previous" class="btn btn-default" onclick="previousWithPause()"><span class="glyphicon glyphicon-step-backward"></span></button>
+                        <button type="button" id="next" class="btn btn-default" onclick="nextWithPause()"><span class="glyphicon glyphicon-step-forward"></span></button>
+                    </div>
 
-			/*background: -webkit-gradient(radial, center center, 0, center center, 460, from(#1a82f7), to(#2F2727));*/
-			background: -webkit-gradient(radial, 50% 50%, 50, 55% 35%, 700,  from(#413EF4), to(#010408));
-		}
+                    <div class="form-group pull-right">
+                        <label>Altitude band </label>
+                        <select id="alt-band" class="form-control"  onchange="changeAltitude()">
+                            <option value="1">200-1600m</option>
+                            <option value="2">above 1600m</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-		path {
-/*			fill: black;
-			stroke: black;*/	
-		}
+        <div id="display">
+            <div class="container">
+                <div id="canvas" data-topography="basemap.topojson">
+                    <div id="map">
+                        <svg id="map-svg" xmlns="http://www.w3.org/2000/svg" version="1.1"/>
+                    </div>
+                    <div id="animation">
+                        <canvas id="animation-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-		.land {
-			/*fill: black;
-			opacity: 1;
-			*/
-		}
+        <!-- Scripts -->
+        <script type="text/javascript" src="when.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.1.0/topojson.min.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/sprintf/0.0.7/sprintf.min.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment.min.js"></script>
+        <script type="text/javascript" src="cartodb-connect.js"></script>
+        <script type="text/javascript" src="mvi.js"></script>
+        <script type="text/javascript" src="birds.js"></script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-		.border {
-			fill: none;
-			stroke: blue;
-			stroke-weight: 5000;
-			stroke-linejoin: round;
-			stroke-linecap: round;
-
-			-webkit-box-shadow:0 0 20px blue; 
-			-moz-box-shadow: 0 0 20px blue; 
-			box-shadow:0 0 20px blue;
-			height:20px;
-			text-align:center;
-			margin:40px auto;
-			width:200px;
-
-		}
-
-		.place
-		{
-			fill: red;
-			stroke-linejoin: round;
-			stroke-linecap: round;
-		}
-
-		.place-label
-		{
-			stroke: white;
-			font-color: white;
-			stroke-linejoin: round;
-			stroke-linecap: round;
-		}
-
-		text {
-			color: white;
-			fill: white;
-			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-			pointer-events: none;
-		}
-
-		.dataTest
-		{
-			fill: white;
-			stroke-linejoin: round;
-			stroke-linecap: round;
-
-		}
-
-		.state19 { fill: #222; }
-		.state20 { fill: #aaa; }
-
-
-	</style>
-</head>
-
-<body>    
-
-	<script>
-
-		var width = 1460,
-		height = 1500;
-
-		var svg = d3.select("body").append("svg")
-		.attr("width", width)
-		.attr("height",height);
-
-		d3.json("us_states_withDataTest.topojson", function(error, basemap) {
-			if (error) return console.error(error);
-
-			var country = topojson.feature(basemap, basemap.objects.countryUS);
-			var city = topojson.feature(basemap, basemap.objects.placesUS);
-			var states = topojson.feature(basemap, basemap.objects.states);
-			var dataTest = topojson.feature(basemap, basemap.objects.dataTest);
-
-				// var projection = d3.geo.mercator()
-				// .scale(500)
-				// .translate([width + 200, height*0.6]);
-
-				// var projection = d3.geo.albers()
-				// .center([150, 0])
-				// .parallels([50, 60])
-				// .scale(500)
-				// .translate([width*1.4, -300]);
-
-				var color = d3.scale.linear()
-				.domain([0, 52])
-				.range(["rgb(30,30,30)","rgb(0,0,0)",
-					"rgb(18,18,18)"]);
-
-				// var color = d3.scale.category20c();
-
-				var projection= d3.geo.albersUsa() 
-				.scale(2500) 
-				.translate([width/2 - 600, height / 2 - 200]);
-
-				var path = d3.geo.path()
-				.projection(projection);
-
-				svg.selectAll(".subunit")
-				.data(topojson.feature(basemap, basemap.objects.placesUS).features)
-				.enter().append("path")
-				.attr("class", function(d) { return "subunit " + d.id; })
-				.attr("d", path);
-
-				svg.selectAll("append")
-				.data(topojson.feature(basemap, basemap.objects.states).features)
-				.enter()
-				.append("path")
-				.attr("d", path)
-				.attr("fill", function(d, i) { return color(i); });
-
-
-				svg.append("path")
-				.datum(country)
-				.attr("class", "land")
-				.attr("d", path);
-
-				svg.append("path")
-				.datum(city)
-				.attr("d", path)
-				.attr("class", "place");
-
-				svg.append("path")
-				.datum(states)
-				.attr("d", path)
-				.attr("class", "border");
-
-				svg.append("path")
-				.datum(dataTest)
-				.attr("d", path)
-				.attr("class", "dataTest");
-
-			});
-
-</script>
-
-
-</body>
-
+          ga('create', 'UA-42312007-2', 'enram.github.io');
+          ga('send', 'pageview');
+        </script>
+    </body>
 </html>
