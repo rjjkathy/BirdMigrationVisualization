@@ -120,4 +120,4 @@ Next step would be to  need to feed in data wave by wave, a few rows a time acco
 Current Visual Effect Screen Shot:
 
 https://github.com/rjjkathy/BirdMigrationVisualization/blob/master/Screen%20Shot%202014-12-16%20at%202.04.02%20AM.png
-
+Where the yellow dots are radar stations, the red dots are major cities, and the white dots are particles moving in direction of the bird migration (they are not birds, just particles representing the movements).
