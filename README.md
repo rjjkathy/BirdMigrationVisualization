@@ -1,4 +1,4 @@
-BirdMigrationVisualization
+NE America Bird Migration Visualization
 ==========================
 
 
