@@ -422,17 +422,19 @@ function interpolateField(data) {
     var radardata = retrieveRadarDataByAltitudeAndTime(altBand, moment.utc(date));
     radardata.done(function(birdData) {
         d.resolve(birdData);
-        data = birdData;
-        // data = {
-        //     //-75.9847,42.1997
-        //     rows: [
-        //     {avg_v_speed: 3, avg_u_speed: -800, latitude: -75.9847, longitude:  45.9469},
-        //     {avg_v_speed: 0, avg_u_speed: -200, latitude: -74.4108, longitude: 42},
-        //     {avg_v_speed: -80, avg_u_speed: 40, latitude:  -74.0639, longitude:  42.5864},
-        //     {avg_v_speed: 0, avg_u_speed: 20, latitude: -72.8639, longitude: 40.8656},
-        //     {avg_v_speed: 1600, avg_u_speed: 0, latitude: -75.44, longitude: 42.8256},
-        //     ]
-        // }
+        //data = birdData;
+        
+        data = {
+            //-75.9847,42.1997
+            rows: [
+            {avg_v_speed: 3, avg_u_speed: -800, latitude: -75.9847, longitude:  45.9469},
+            {avg_v_speed: 0, avg_u_speed: -200, latitude: -74.4108, longitude: 42},
+            {avg_v_speed: -80, avg_u_speed: 40, latitude:  -74.0639, longitude:  42.5864},
+            {avg_v_speed: 0, avg_u_speed: 20, latitude: -72.8639, longitude: 40.8656},
+            {avg_v_speed: 1600, avg_u_speed: 0, latitude: -75.44, longitude: 42.8256},
+            ]
+        }
+        
         interpolateField(data);
     });
     log.debug("return data");

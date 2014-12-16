@@ -36,6 +36,7 @@ topojson \
   placesUS.json
   
 ## Drawing Base Map
+   Use d3 library, to load the basemap.topojson created in the above steps:
 
 # <script>
 
@@ -52,6 +53,8 @@ topojson \
       var country = topojson.feature(basemap, basemap.objects.countryUS);
       var city = topojson.feature(basemap, basemap.objects.placesUS);
       var states = topojson.feature(basemap, basemap.objects.states);
+
+      // radar location info
       var dataTest = topojson.feature(basemap, basemap.objects.dataTest);
 
         var color = d3.scale.linear()
@@ -97,3 +100,19 @@ topojson \
       });
 
 </script>
+
+
+# Animation Layer
+  The animation process is contained in bird.js file.
+
+## Producing vectors
+
+The interpolate method returns a vector using all of the data in one input, so we get one vector
+it uses the bunch of points, and performs inverse distance weighting, which basically produces values for unknown points on the map using knn, and by putting a weighted mean force on the known ones(through some magic complicated formula).
+Then it takes another bunch of input, and produces a new vector.
+
+And then it fades the old particle, and starts to draw particle with new vector.
+
+Current we are manually setting data to one known input, so it loads the same vector every time, the only vector that is produced every time is [-4.46, -9.88]. Thus current visual effect is particles are constantly going in the same direction.
+
+Next step would be to  need to feed in data wave by wave, a few rows a time according to the time difference, instead of reading in the same data each round. That would involve converting current data into the right format, and let the script read in chunk by chunk, ideally from local data input, not from server (this part does not work yet.)
