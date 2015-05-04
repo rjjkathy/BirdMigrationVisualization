@@ -3,35 +3,21 @@
 <head>
     <meta charset="utf-8">
     <title>Twisting Existing Code</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, height = device-height, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="main.css"/>
 </head>
 <body>
-    <div id="controls">
+   <div id="controls">
         <div class="container">
             <div class="form-inline clearfix">
                 <div class="form-group pull-left">
                     <label class="sr-only" for="time-int">Date/time</label>
-                    <input type="datetime" id="time-int" class="form-control" onfocus="pause()" value="April 5 2013, 00:00">
-
-                    <button type="button" id="play-pause" class="btn btn-default" onclick="playPause()"><span class="glyphicon glyphicon-pause"></button>
-
-                    <button type="button" id="previous" class="btn btn-default" onclick="previousWithPause()"><span class="glyphicon glyphicon-step-backward"></span></button>
-                    <button type="button" id="next" class="btn btn-default" onclick="nextWithPause()"><span class="glyphicon glyphicon-step-forward"></span></button>
-                </div>
-
-                <div class="form-group pull-right">
-                    <label>Altitude band </label>
-                    <select id="alt-band" class="form-control"  onchange="changeAltitude()">
-                        <option value="1">200-1600m</option>
-                        <option value="2">above 1600m</option>
-                    </select>
+                    <input type = "text/css" id="time-int" class="form-control" onfocus="pause()" value="Loading radar data ...">
                 </div>
             </div>
         </div>
     </div>
-
     <div id="display">
         <div class="container">
             <div id="canvas" data-topography="basemap.topojson">
