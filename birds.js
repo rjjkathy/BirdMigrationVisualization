@@ -1,6 +1,7 @@
 /**
- * Bird migration flow visualization for Belgium & the Netherlands
+ * Bird migration flow visualization for Northestern US
  *
+ * based on birds.js from:
  * https://github.com/enram/bird-migration-flow-visualization
  * Copyright (c) 2014 LifeWatch INBO
  * The MIT License - http://opensource.org/licenses/MIT
@@ -34,11 +35,6 @@ var data = {rows: [ {avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0},
 {avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0},
 {avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0}] };
 
-var windData = {rows: [ {avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0},
-{avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0},
-{avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0},
-{avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0}] };
-
 var interval;
 var basemap;
 var field;
@@ -47,8 +43,7 @@ var maxX;
 var minY;
 var maxY;
 var columns;
-var min_date = moment.utc("April 5 2013, 00:00", DATE_FORMAT);
-var max_date = moment.utc("April 11 2013, 23:40", DATE_FORMAT);
+
 var dataObject;
 var readCount = 0;
 var bbox = [-80, 45, -65, 47];
@@ -57,12 +52,12 @@ var currentParticleCount = 100;
 var stations = [];
 var dict = {};
 var stationsMap = new Map();
-var xRange = 2.5;
-var yRange = 2.5;
-var radius = 2.5;
+var xRange = 2;
+var yRange = 2;
+var radius = 2.2;
 var highestDensity = 0;
 var densityScale;
-var frameNumber = 0;
+var frameNumber = "Loading radar data...";
 
 /** 
  * Extract parameters sent to us by the server.
@@ -104,7 +99,9 @@ var frameNumber = 0;
     particleCount: 100
 };
 
-
+/**
+ * Initialize information for each station
+ */
 function createStations()
 {
 	var station1 = {
@@ -269,6 +266,9 @@ function createStations()
 
 }
 
+/**
+ * Convert station name into station number
+ */
 function stationNameToId(name)
 {
 	if(name == "KBGM")
@@ -298,6 +298,7 @@ function stationNameToId(name)
 	else if(name == "KCBW")
 		return 12;
 }
+
 /**
  * Initialize the application
  * Determine screen sizes
@@ -335,6 +336,9 @@ function stationNameToId(name)
  	return d.promise;
  }
 
+/**
+ * Loads the radar data csv file, returns a promise
+ */
  function loadCSV()
  {
  	log.time("csv Retrieval...");
@@ -359,6 +363,7 @@ function stationNameToId(name)
  			}
 
  			densityScale = highestDensity/1000;
+ 			frameNumber = 0;
  			alert("Radar data loaded, press OK to start bird migration visualization");
  		}
  	});
@@ -366,8 +371,9 @@ function stationNameToId(name)
  	log.debug("CSV Retrieved");
  	return d.promise;
  }
+
 /**
- * Load the basemap in the svg with the countries, country border and radars
+ * Load the basemap in the svg with the countries, state border, major cities and radar locations
  */
  function loadMap(bm) {
  	log.debug("Creating basemap...");
@@ -428,10 +434,7 @@ function stationNameToId(name)
 
             }
 
-/**
- * Here comes all the animation and interpolation stuff
- */
-
+//========================================ANIMATION STUFF========================================================================
 
 // Create particle object
 function createParticle(age) {
@@ -644,7 +647,6 @@ function buildPointsFromRadars(data) {
 }
 
 function createField() {
-
 	log.debug("creating field");
 	var nilVector = [NaN, NaN, NaN];
 	field = function(x, y) {
@@ -662,6 +664,9 @@ function createField() {
 	return field;
 }
 
+/**
+ * Interpolates the motion vector
+ */
 function interpolateField(data) {
 	log.debug("interpolateField begin");
 
@@ -712,9 +717,7 @@ function interpolateField(data) {
     batchInterpolate();
 }
 
-/**
- * End of the animation and interpolation stuff
- */
+
 
 /**
  * Start the animation once the data is in. This method is used in the dependency tree and will 
@@ -728,6 +731,9 @@ animateTimeFrame(data, albers_projection);
 play();
 }
 
+/**
+ * clear the birds count for each station after each wave of input data
+ */
 function resetBirdNumber()
 {
 	 for(var i = 0; i < stations.length; i++)
@@ -738,7 +744,7 @@ function resetBirdNumber()
 }
 
 /**
- * Read the values for time and altitude, retrieve data from cartodb and interpolate all fields again
+ * Read the next batch of radar data
  */
  function updateRadarData() {
 
@@ -769,12 +775,10 @@ function resetBirdNumber()
        if(currentBird.benjamin == "accept" && currentBird.andrew == "accept")
         {
         currentBirdArray.push(row);
-    	particleNum += currentBird.tot_refl_trim / densityScale;
+    	//particleNum += currentBird.tot_refl_trim / densityScale;
     	//station.birdNumber += currentBird.tot_refl_trim / densityScale;
-    	station.birdNumber += currentBird.tot_refl_trim * 1.2;
-
-        }
-        
+    	station.birdNumber += currentBird.tot_refl_trim / densityScale;
+        }       
         station.stationReadCount++;
     }
 
@@ -796,7 +800,7 @@ log.debug("return data");
 return promise;
 }
 
-    // For sorting scan
+    // For sorting the csv file input
     function scanCompare(a, b)
     {
     	if (a.year < b.year)  { return -1; }
@@ -814,6 +818,7 @@ return promise;
     	return 0;
     }
 
+    // wrapping around the math library for degree sine calculation
     Math.dsin = function() {
     	var piRatio = Math.PI / 180;
     	return function dsin(degrees) {
@@ -821,6 +826,7 @@ return promise;
     	};
     }();
 
+    // wrapping around the math library for degree cosine calculation
     Math.dcos = function() {
     	var piRatio = Math.PI / 180;
     	return function dcos(degrees) {
@@ -829,8 +835,7 @@ return promise;
     }();
 
 /**
- * Hacky hack hack, imo...
- * Bind to input field to make enter work when user changes date manually
+ * Hacky hack hack
  */
  $(TIME_INTERVAL_ID).bind("keyup", function(event) {
  	if (event.which == 13) {
@@ -849,29 +854,19 @@ return promise;
  }
 
 /**
- * Subtract TIME_OFFSET minutes from entered time and show results
+ * Update the displayed frame number
  */
  function previous() {
- 	var datetime = $(TIME_INTERVAL_ID).val();
- 	var date = moment.utc(datetime, DATE_FORMAT);
- 	date = moment(date).subtract('minutes', 20);
- 	//$(TIME_INTERVAL_ID).val(moment.utc(date).format(DATE_FORMAT));
- 	$(TIME_INTERVAL_ID).val("Animation frame number: " + frameNumber.toString());
+ 	$(TIME_INTERVAL_ID).val("Frame: " + frameNumber.toString());
  	updateRadarData();
  }
 
 
 /**
- * Add TIME_OFFSET minutes from entered time and show results
+ * Update the displaced frame number
  */
  function next(){
- 	var datetime = $(TIME_INTERVAL_ID).val();
- 	var date = moment.utc(datetime, DATE_FORMAT);
- 	date = moment(date).add('minutes', 20);
- 	if (date > max_date) {
- 		date = min_date;
- 	}
- 	$(TIME_INTERVAL_ID).val("Animation frame number: " + frameNumber.toString());
+ 	$(TIME_INTERVAL_ID).val("Frame: " + frameNumber.toString());
  	updateRadarData();
  }
 
@@ -924,26 +919,6 @@ return promise;
  	}
  }
 
- function getStationData()
- {
- 	log.debug("csv sorting...");
- 	var d = when.defer();
- 	sortCSV();
- 	log.timeEnd("csv sorted");
- 	return d.promise;
- }
-
- function sortCSV()
- {
- 	scanList.sort(scanCompare);
- 	for(var i = 0; i < scanList.length; i++)
- 	{
- 		var name = scanList[i].station;
- 		var index = stationNameToId(name);
-
- 		stations[index].stationData.push(scanList[i]);
- 	}
- }
 /**
  * Returns a function that takes an array and applies it as arguments to the specified function. Yup. Basically
  * the same as when.js/apply.

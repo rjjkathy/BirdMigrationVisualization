@@ -19,7 +19,9 @@ mvi = function() {
         addVectors: addVectors,
         inverseDistanceWeighting: inverseDistanceWeighting,
         thinPlateSpline: thinPlateSpline,
-        bilinear: bilinear
+        bilinear: bilinear,
+        dist : dist,
+        dist2 : dist2
     };
 
     /**

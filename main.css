@@ -7,13 +7,14 @@
 }
 
 #display {
-    background: -webkit-gradient(radial, 30% 50%, 50, 55% 35%, 700,  from(#413EF4), to(#010408));    height: 600px;
-
-    margin-bottom: 20px;
-    margin-top: 20px;
+    /*background: -webkit-gradient(radial, 30% 50%, 50, 55% 35%, 700,  from(#413EF4), to(#010408)); */
+    background: black;
+    height: 1000px;   
 }
 #canvas {
-    background: -webkit-gradient(radial, 30% 50%, 50, 55% 35%, 700,  from(#413EF4), to(#010408));    height: 600px;
+    background: -webkit-gradient(radial, 30% 50%, 50, 55% 35%, 700,  from(#413EF4), to(#010408)); 
+    height:800px;
+    width: 1200px;
     overflow: hidden; /* Cuts of #map-svg and #field-canvas */
     position: relative;
 }
