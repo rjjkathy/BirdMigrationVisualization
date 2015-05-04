@@ -1,68 +1,70 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Twisting Existing Code</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="main.css"/>
-    </head>
-    <body>
-        <div id="controls">
-            <div class="container">
-                <div class="form-inline clearfix">
-                    <div class="form-group pull-left">
-                        <label class="sr-only" for="time-int">Date/time</label>
-                        <input type="datetime" id="time-int" class="form-control" onfocus="pause()" value="April 5 2013, 00:00">
+<head>
+    <meta charset="utf-8">
+    <title>Twisting Existing Code</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="main.css"/>
+</head>
+<body>
+    <div id="controls">
+        <div class="container">
+            <div class="form-inline clearfix">
+                <div class="form-group pull-left">
+                    <label class="sr-only" for="time-int">Date/time</label>
+                    <input type="datetime" id="time-int" class="form-control" onfocus="pause()" value="April 5 2013, 00:00">
 
-                        <button type="button" id="play-pause" class="btn btn-default" onclick="playPause()"><span class="glyphicon glyphicon-pause"></button>
+                    <button type="button" id="play-pause" class="btn btn-default" onclick="playPause()"><span class="glyphicon glyphicon-pause"></button>
 
-                        <button type="button" id="previous" class="btn btn-default" onclick="previousWithPause()"><span class="glyphicon glyphicon-step-backward"></span></button>
-                        <button type="button" id="next" class="btn btn-default" onclick="nextWithPause()"><span class="glyphicon glyphicon-step-forward"></span></button>
-                    </div>
+                    <button type="button" id="previous" class="btn btn-default" onclick="previousWithPause()"><span class="glyphicon glyphicon-step-backward"></span></button>
+                    <button type="button" id="next" class="btn btn-default" onclick="nextWithPause()"><span class="glyphicon glyphicon-step-forward"></span></button>
+                </div>
 
-                    <div class="form-group pull-right">
-                        <label>Altitude band </label>
-                        <select id="alt-band" class="form-control"  onchange="changeAltitude()">
-                            <option value="1">200-1600m</option>
-                            <option value="2">above 1600m</option>
-                        </select>
-                    </div>
+                <div class="form-group pull-right">
+                    <label>Altitude band </label>
+                    <select id="alt-band" class="form-control"  onchange="changeAltitude()">
+                        <option value="1">200-1600m</option>
+                        <option value="2">above 1600m</option>
+                    </select>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div id="display">
-            <div class="container">
-                <div id="canvas" data-topography="basemap.topojson">
-                    <div id="map">
-                        <svg id="map-svg" xmlns="http://www.w3.org/2000/svg" version="1.1"/>
-                    </div>
-                    <div id="animation">
-                        <canvas id="animation-canvas"></canvas>
-                    </div>
+    <div id="display">
+        <div class="container">
+            <div id="canvas" data-topography="basemap.topojson">
+                <div id="map">
+                    <svg id="map-svg" xmlns="http://www.w3.org/2000/svg" version="1.1"/>
+                </div>
+                <div id="animation">
+                    <canvas id="animation-canvas"></canvas>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Scripts -->
-        <script type="text/javascript" src="when.js"></script>
-        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
-        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/topojson/1.1.0/topojson.min.js"></script>
-        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/sprintf/0.0.7/sprintf.min.js"></script>
-        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment.min.js"></script>
-        <script type="text/javascript" src="cartodb-connect.js"></script>
-        <script type="text/javascript" src="mvi.js"></script>
-        <script type="text/javascript" src="birds.js"></script>
-        <script>
-          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    <!-- Scripts -->
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+    <script src="http://shannon.cs.umass.edu/sheldon/cajun/2014-07-27/vis/jquery.csv-0.71.js"></script>
+    <script type="text/javascript" src="when.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/topojson/1.1.0/topojson.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/sprintf/0.0.7/sprintf.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment.min.js"></script>
+    <script type="text/javascript" src="cartodb-connect.js"></script>
+    <script type="text/javascript" src="mvi.js"></script>
+    <script type="text/javascript" src="birds.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-          ga('create', 'UA-42312007-2', 'enram.github.io');
-          ga('send', 'pageview');
-        </script>
-    </body>
+  ga('create', 'UA-42312007-2', 'enram.github.io');
+  ga('send', 'pageview');
+  </script>
+</body>
 </html>

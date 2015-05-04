@@ -29,7 +29,16 @@ var interval;
 var particles = [];
 var g;
 var albers_projection;
-var data;
+var data = {rows: [ {avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0},
+{avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0},
+{avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0},
+{avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0}] };
+
+var windData = {rows: [ {avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0},
+{avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0},
+{avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0},
+{avg_v_speed: 0, avg_u_speed:0, latitude: 0, longitude : 0}] };
+
 var interval;
 var basemap;
 var field;
@@ -40,8 +49,14 @@ var maxY;
 var columns;
 var min_date = moment.utc("April 5 2013, 00:00", DATE_FORMAT);
 var max_date = moment.utc("April 11 2013, 23:40", DATE_FORMAT);
-var birdJSON = "dataTest.geojson";
+var dataObject;
+var readCount = 0;
 var bbox = [-80, 45, -65, 47];
+var scanList;
+var currentParticleCount = 300;
+var stations = [];
+var dict = {};
+var stationsMap = new Map();
 
 /** 
  * Extract parameters sent to us by the server.
@@ -78,55 +93,175 @@ var bbox = [-80, 45, -65, 47];
  var settings = {
     vectorscale: (view.height / 1000),
     frameRate: 60, // desired milliseconds per frame
-    framesPerTime: 40, // desired frames per time interval
-    maxParticleAge: 60, // max number of frames a particle is drawn before regeneration
+    framesPerTime: 30, // desired frames per time interval
+    maxParticleAge: 15, // max number of frames a particle is drawn before regeneration
     particleCount: 300
 };
+
+var key = function(station){
+  return station.name;
+};
+
+
+function createStations()
+{
+ var station1 = {
+    birdNumber: 1,
+    name : "KBGM",
+    lat: 42.1997,
+    long:-75.9847,
+    subParticles: []
+}
+stationsMap.set("KBGM",station1);
+stations.push(station1);
+
+
+var station2 = {
+    birdNumber: 1,
+    name : "KCXX",
+    lat: 44.5111 ,
+    long:-73.1669,
+        subParticles: []
+
+}
+stationsMap.set("KCXX",station2);
+stations.push(station2);
+
+
+var station3 = {
+    birdNumber: 1,
+    name : "KBOX",
+    lat: 41.9558    ,
+    long:-71.1369,
+        subParticles: []
+
+}
+stationsMap.set("KBOX",station3);
+stations.push(station3);
+
+
+var station4 = {
+    birdNumber: 1,
+    name : "KLWX",
+    lat: 38.9753,
+    long:-77.4778,
+        subParticles: []
+
+}
+stationsMap.set("KLWX",station4);
+stations.push(station4);
+
+var station5 = {
+    birdNumber: 1,
+    name : "KTYX",
+    lat: 43.7508,
+    long:-75.675,
+        subParticles: []
+
+}
+stationsMap.set("KTYX",station5);
+stations.push(station5);
+
+var station6 = {
+    birdNumber: 1,
+    name : "KCCX",
+    lat: 40.9231,
+    long:-78.0036,
+        subParticles: []
+
+}
+stationsMap.set("KCCX",station6);
+stations.push(station6);
+
+var station7 = {
+    birdNumber: 1,
+    name : "KDIX",
+    lat: 39.9469    ,
+    long:-74.4108,
+        subParticles: []
+
+}
+stationsMap.set("KDIX",station7);
+stations.push(station7);
+
+var station8 = {
+    birdNumber: 1,
+    name : "KBUF",
+    lat: 42.9489    ,
+    long:   -78.7367,
+        subParticles: []
+
+}
+stationsMap.set("KBUF",station8);
+stations.push(station8);
+
+var station9 = {
+    birdNumber: 1,
+    name : "KENX",
+    lat: 42.5864 ,
+    long: -74.0639,
+        subParticles: []
+
+}
+stationsMap.set("KENX",station9);
+stations.push(station9);
+
+var station10 = {
+    birdNumber: 1,
+    name : "KOKX",
+    lat: 40.8656,    
+    long:-72.8639,
+        subParticles: []
+
+}
+stationsMap.set("KOKX",station10);
+stations.push(station10);
+
+var station11 = {
+    birdNumber: 1,
+    name : "KDOX",
+    lat: 38.8256,    
+    long:-75.44
+}
+stationsMap.set("KDOX",station11);
+stations.push(station11);
+
+var station12 = {
+    birdNumber: 1,
+    name : "KGYX",
+    lat: 43.8914 ,   
+    long:-70.2567,
+        subParticles: []
+
+}
+stationsMap.set("KGYX",station12);
+stations.push(station12);
+
+var station13 = {
+    birdNumber: 1,
+    name : "KCBW",
+    lat: 46.0394,    
+    long:-67.8067,
+        subParticles: []
+
+}
+stationsMap.set("KCBW",station13);
+stations.push(station13);
+
+}
 
 /**
  * Initialize the application
  * Determine screen sizes
  */
  function init() {
+
     // log.debug("Topography URI: " + displayData.topography);
     // Modify the display elements to fill the screen.
     d3.select(CANVAS_ID).attr("width", view.width).attr("height", view.height);
     d3.select(MAP_SVG_ID).attr("width", view.width).attr("height", view.height);
     d3.select(ANIMATION_CANVAS_ID).attr("width", view.width).attr("height", view.height);
-
-    $.get("dataTest.geojson", function(data){  
-        alert(data);
-        birdJSON = data;
-    });
-
-} 
-
-/**
- * Returns a d3 Albers conical projection (en.wikipedia.org/wiki/Albers_projection) that maps the bounding box
- * defined by the lower left geographic coordinates (lng0, lat0) and upper right coordinates (lng1, lat1) onto
- * the view port having (0, 0) as the upper left point and (width, height) as the lower right point.
- */
-function createAlbersProjection(lng0, lat0, lng1, lat1, view) {
-    // Construct a unit projection centered on the bounding box. NOTE: center calculation will not be correct
-    // when the bounding box crosses the 180th meridian. Don't expect that to happen to Tokyo for a while...
-    // log.time("Creating projection");
-    var projection = d3.geo.albers()
-        .rotate([-((lng0 + lng1) / 2), 0]) // rotate the globe from the prime meridian to the bounding box's center
-        .center([0, (lat0 + lat1) / 2])    // set the globe vertically on the bounding box's center
-        .scale(1)
-        .translate([0, 0]);
-    // Project the two longitude/latitude points into pixel space. These will be tiny because scale is 1.
-    var p0 = projection([lng0, lat0]);
-    var p1 = projection([lng1, lat1]);
-    // The actual scale is the ratio between the size of the bounding box in pixels and the size of the view port.
-    // Reduce by 5% for a nice border.
-    var s = 1 / Math.max((p1[0] - p0[0]) / view.width, (p0[1] - p1[1]) / view.height) * 0.95;
-    // Move the center to (0, 0) in pixel space.
-    var t = [view.width / 2, view.height / 2 - 200];
-    // log.timeEnd("Projection created");
-    return projection
-           .scale(s/4)
-           .translate(t);
+    createStations();
 } 
 
 /**
@@ -145,9 +280,22 @@ function createAlbersProjection(lng0, lat0, lng1, lat1, view) {
         d.reject({error: -1, message: "Cannot load resource: " + resource, resource: resource}) :
         d.reject({error: error.status, message: error.statusText, resource: resource}) :
         d.resolve(result);
+
     });
-   log.timeEnd("JSON Retrieved");
-   return d.promise;
+
+
+jQuery.ajax({
+    url: "data/meta_all.csv",
+    cache: false,
+    success: function(response) {
+        scanList = $.csv.toObjects(response);
+        scanList.sort(scanCompare);
+        alert(scanList);
+    }
+});
+
+log.timeEnd("JSON Retrieved");
+return d.promise;
 }
 
 /**
@@ -229,25 +377,70 @@ function createParticle(age) {
     return particle
 }
 
+// Create particle with specified location
+function createParticleWithLocation(age, lat, long)
+{
+    var particle = {
+        age: age,
+        x: lat,
+        y: long,
+        xt: 0,
+        yt: 0
+    }
+    return particle
+}
+
 // Calculate the next particle's position
 function evolve() {
-    particles.forEach(function(particle, i) {
-        if (particle.age >= settings.maxParticleAge) {
-            particles.splice(i, 1);
-            particle = createParticle(Math.floor(rand(0, settings.maxParticleAge/2))); // respawn
-            particles.push(particle);
+
+    stations.forEach(function(station)
+    {
+        var birdNumber = station.birdNumber;
+        var lat = station.lat;
+        var long = station.long;
+        var subParticles = station.subParticles;
+
+       if(subParticles.length != 0){
+
+       station.subParticles.forEach(function(particle,i)
+        {
+            if (particle.age >= settings.maxParticleAge) {
+            subParticles.splice(i, 1);
+
+            var x = rand(station.lat -2.5, station.lat + 2.5);
+            var y = rand(station.long -2.5, station.long +2.5);
+            var p = albers_projection([y, x]);
+
+            particle = createParticleWithLocation(Math.floor(rand(0, settings.maxParticleAge/2)),p[0], p[1]); // respawn
+            subParticles.push(particle);
         }
+
         var x = particle.x;
         var y = particle.y;
-        var uv = field(x, y);
-        var u = uv[0];
-        var v = uv[1];
-        var xt = x + u;
-        var yt = y + v;
-        particle.age += 1;
-        particle.xt = xt;
-        particle.yt = yt;
+        if(field != null)
+        {
+            var uv = field(x, y);
+            var u = uv[0];
+            var v = uv[1];
+            var xt = x +u ;
+            var yt = y+v;
+            particle.age += 1;
+            particle.xt = xt;
+            particle.yt = yt;
+        }   
+        else
+        {
+            particle.age += 1;
+            particle.xt = x;
+            particle.yt = y;
+        }
+
+        });
+        
+    }
+
     });
+
 }
 
 // Draw a line between a particle's current and next position
@@ -258,14 +451,24 @@ function draw() {
     g.fillRect(0, 0, view.width, view.height);
     g.globalCompositeOperation = prev;
 
-    // Draw new particle trails
-    particles.forEach(function(particle) {
-        if (particle.age < settings.maxParticleAge) {
+    stations.forEach(function(station)
+    {
+        var birdNumber = station.birdNumber;
+        var lat = station.lat;
+        var long = station.long;
+        var subParticles = station.subParticles;
+
+        subParticles.forEach(function(particle)
+        {
+           if (particle.age < settings.maxParticleAge) {
             g.moveTo(particle.x, particle.y);
             g.lineTo(particle.xt, particle.yt);
             particle.x = particle.xt;
             particle.y = particle.yt;
         };
+
+        });
+
     });
 }
 
@@ -274,18 +477,56 @@ function runTimeFrame() {
     g.beginPath();
     evolve();
     draw();
-    g.stroke();
-};
+
+    stations.forEach(function(station)
+    {
+        var birdNumber = station.birdNumber;
+        var lat = station.lat;
+        var long = station.long;
+        var subParticles = station.subParticles;
+
+        subParticles.forEach(function(particle)
+        {
+           if(subParticles.length < birdNumber)
+            {
+             for(var i = 0; i < birdNumber - subParticles.length; i++){
+            var x = rand(station.lat -2.5, station.lat + 2.5);
+            var y = rand(station.long -2.5, station.long +2.5);
+            var p = albers_projection([y, x]);
+
+            var particle = createParticleWithLocation(Math.floor(rand(0, settings.maxParticleAge)),p[0], p[1]);
+            subParticles.push(particle);
+                }
+             }else if (subParticles.length > birdNumber){
+
+              for(var i = 0; i <  subParticles.length - birdNumber; i++){
+                subParticles.splice(Math.floor(rand(0,subParticles.length-1)), 1);
+                }     
+             }
+        });
+
+    });
+
+   g.stroke();
+}
 
 function animateTimeFrame(data, projection) {
     g = d3.select(ANIMATION_CANVAS_ID).node().getContext("2d");
-    g.lineWidth = 0.7;
-    g.strokeStyle = "rgba(255, 255, 255, 1)";
+    g.lineWidth = 0.9;
+    g.strokeStyle = "rgba(255, 165, 100, 1)";
     g.fillStyle = "rgba(255, 255, 255, 0.7)"; /*  White layer to be drawn over existing trails */
-    particles = []
-    for (var i=0; i< settings.particleCount; i++) {
-        particles.push(createParticle(Math.floor(rand(0, settings.maxParticleAge))));
-    }
+
+     stations.forEach(function(station) {
+       station.subParticles = [];
+       for (var i = 0 ; i< station.birdNumber; i++)
+       {
+            var x = rand(station.lat -2.5, station.lat + 2.5);
+            var y = rand(station.long -2.5, station.long + 2.5);
+            var p = albers_projection([y, x]);           
+
+            station.subParticles.push(createParticleWithLocation(Math.floor(rand(0, settings.maxParticleAge)), p[0], p[1]));
+       } 
+});
     interval = setInterval(runTimeFrame, settings.frameRate);
 }
 
@@ -345,13 +586,12 @@ function createField() {
 }
 
 function interpolateField(data) {
-               log.debug("interpolateField begin");
+   log.debug("interpolateField begin");
 
-
-    var points = buildPointsFromRadars(data);
-    var numberOfPoints = points.length;
-    if (numberOfPoints > 5) {
-        numberOfPoints = 5; // maximum number of points to interpolate from.
+   var points = buildPointsFromRadars(data);
+   var numberOfPoints = points.length;
+   if (numberOfPoints > 13) {
+        numberOfPoints = 13; // maximum number of points to interpolate from.
     }
     var interpolate = mvi.inverseDistanceWeighting(points, numberOfPoints);
     var tempColumns = [];
@@ -405,41 +645,113 @@ function interpolateField(data) {
  */
  function startAnimation() {
     log.debug("All data is available, start animation");
-    log.debug("data: " + data);
-    log.debug("albers: " + albers_projection);
+//     log.debug("data: " + data);
+//     log.debug("albers: " + albers_projection);
     animateTimeFrame(data, albers_projection);
     play();
 }
+
 /**
  * Read the values for time and altitude, retrieve data from cartodb and interpolate all fields again
  */
  function updateRadarData() {
-    log.debug("get radar data");
-    var d = when.defer();
-    var altBand = $(ALTITUDE_BAND_ID).val();
-    var datetime = $(TIME_INTERVAL_ID).val();
-    var date = moment.utc(datetime, DATE_FORMAT);
-    var radardata = retrieveRadarDataByAltitudeAndTime(altBand, moment.utc(date));
-    radardata.done(function(birdData) {
-        d.resolve(birdData);
-        //data = birdData;
-        
-        data = {
-            //-75.9847,42.1997
-            rows: [
-            {avg_v_speed: 3, avg_u_speed: -800, latitude: -75.9847, longitude:  45.9469},
-            {avg_v_speed: 0, avg_u_speed: -200, latitude: -74.4108, longitude: 42},
-            {avg_v_speed: -80, avg_u_speed: 40, latitude:  -74.0639, longitude:  42.5864},
-            {avg_v_speed: 0, avg_u_speed: 20, latitude: -72.8639, longitude: 40.8656},
-            {avg_v_speed: 1600, avg_u_speed: 0, latitude: -75.44, longitude: 42.8256},
-            ]
-        }
-        
-        interpolateField(data);
-    });
-    log.debug("return data");
-    return d.promise;
+
+    var promise = when.promise(function(resolve, reject, notify) {
+        if(scanList != null)
+        {
+            log.debug("get radar data");
+            var currentBirdArray = [];
+            var currentWindArray = [];
+            var particleNum = 0;
+            var subParticleNum = 0;
+
+            while(currentBirdArray.length != 13)
+            {
+                var currentBird = scanList[readCount];
+                var stationName = currentBird.station;
+                var lat = currentBird.lat;
+                var long = currentBird.lon;
+                var direction = 90 - currentBird.avg_direction_wtd_med_nomask;
+                var speed = currentBird.avg_speed_wtd_med_nomask;
+                var v = Math.dsin(direction)*speed * 0.5;
+                var u = Math.dcos(direction)*speed * 0.5;
+                var row = {avg_v_speed: v, avg_u_speed:u, latitude: lat, longitude : long};
+
+                if (currentBird.benjamin == "accept" && currentBird.andrew == "accept")
+                {
+                    currentBirdArray.push(row);
+                    particleNum += currentBird.tot_refl_trim * 1.2;
+
+                    // Update corresponding station data                 
+                     stations.forEach(function(s)
+                    {
+                        if(s.name == stationName)
+                        {
+                            s.birdNumber += currentBird.tot_refl_trim * 1.2;
+                        }
+                    });
+
+                 }
+                else
+                {
+                        // this is wind data
+                        currentWindArray.push(row);
+                    }
+
+                    readCount++;
+                }
+
+                currentParticleCount = particleNum;
+
+               
+                data = {
+                    rows: currentBirdArray
+                }
+                windData = {
+                    rows: currentWindArray
+                }
+
+                interpolateField(data);
+            }
+
+            resolve(data);
+        });
+
+log.debug("return data");
+return promise;
 }
+
+    // For sorting scan
+    function scanCompare(a, b)
+    {
+        if (a.year < b.year)  { return -1; }
+        if (a.year > b.year)  { return  1; }
+
+        if (a.scan_month < b.scan_month) { return -1; }
+        if (a.scan_month > b.scan_month) { return  1; }
+
+        if (a.scan_day < b.scan_day) { return -1; }
+        if (a.scan_day > b.scan_day) { return  1; }
+
+        if (a.scan_time < b.scan_time) { return -1; }
+        if (a.scan_time > b.scan_time) { return  1; }
+
+        return 0;
+    }
+
+    Math.dsin = function() {
+      var piRatio = Math.PI / 180;
+      return function dsin(degrees) {
+        return Math.sin(degrees * piRatio);
+    };
+}();
+
+Math.dcos = function() {
+  var piRatio = Math.PI / 180;
+  return function dcos(degrees) {
+    return Math.cos(degrees * piRatio);
+};
+}();
 
 /**
  * Hacky hack hack, imo...
