@@ -108,16 +108,7 @@ topojson \
 ## Producing vectors
 
 The interpolate method returns a vector using all of the data in one input, so we get one vector
-it uses the bunch of points, and performs inverse distance weighting, which basically produces values for unknown points on the map using knn, and by putting a weighted mean force on the known ones(through some magic complicated formula).
+it uses the bunch of points, and performs inverse distance weighting, which basically produces values for unknown points on the map using knn, and by putting a weighted mean force on the known ones.
 Then it takes another bunch of input, and produces a new vector.
 
 And then it fades the old particle, and starts to draw particle with new vector.
-
-Current we are manually setting data to one known input, so it loads the same vector every time, the only vector that is produced every time is [-4.46, -9.88]. Thus current visual effect is particles are constantly going in the same direction.
-
-Next step would be to  need to feed in data wave by wave, a few rows a time according to the time difference, instead of reading in the same data each round. That would involve converting current data into the right format, and let the script read in chunk by chunk, ideally from local data input, not from server (this part does not work yet.)
-
-Current Visual Effect Screen Shot:
-
-https://github.com/rjjkathy/BirdMigrationVisualization/blob/master/Screen%20Shot%202014-12-16%20at%202.04.02%20AM.png
-Where the yellow dots are radar stations, the red dots are major cities, and the white dots are particles moving in direction of the bird migration (they are not birds, just particles representing the movements).
